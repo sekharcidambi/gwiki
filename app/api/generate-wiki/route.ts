@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
         console.log(`Failed to enhance page ${page.title}:`, error)
         
         // Check if it's a rate limit error
-        if (error.status === 429) {
+        if (error && typeof error === 'object' && 'status' in error && error.status === 429) {
           console.log('Rate limit hit, waiting 60 seconds before continuing...')
           await new Promise(resolve => setTimeout(resolve, 60000)) // Wait 60 seconds
           // Try one more time after waiting
