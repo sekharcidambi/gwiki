@@ -16,12 +16,6 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     if (contentRef.current) {
       // Configure marked options
       marked.setOptions({
-        highlight: function (code, lang) {
-          if (lang && SyntaxHighlighter.supportedLanguages.includes(lang)) {
-            return SyntaxHighlighter.highlight(code, { language: lang, style: tomorrow })
-          }
-          return code
-        },
         breaks: true,
         gfm: true,
       })
