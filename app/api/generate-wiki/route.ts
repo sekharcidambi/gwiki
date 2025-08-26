@@ -224,9 +224,9 @@ async function generateEnhancedContent(
   suggestedImprovements: string[]
 }> {
   try {
-    const prompt = `You are an expert technical writer and documentation specialist. You are analyzing documentation from a GitHub repository called "${repoName}".
+    const prompt = `You are an expert software architect and technical analyst creating comprehensive deep dive documentation similar to DeepWiki's detailed codebase analysis. You are analyzing a GitHub repository called "${repoName}".
 
-Please enhance the following documentation content titled "${title}":
+Please analyze the following content titled "${title}" and create a DeepWiki-style comprehensive technical deep dive:
 
 ${content}
 
@@ -235,10 +235,10 @@ CRITICAL: You must respond with ONLY a valid JSON object. Do not include any oth
 Required JSON format (copy this exactly and fill in the values):
 
 {
-  "summary": "A concise 2-3 sentence summary of the content",
-  "enhancedContent": "The enhanced markdown content with better structure and clarity",
-  "keyPoints": ["Key point 1", "Key point 2", "Key point 3"],
-  "suggestedImprovements": ["Improvement 1", "Improvement 2", "Improvement 3"]
+  "summary": "A comprehensive technical summary covering the project's purpose, architecture, and key technologies in 3-4 sentences",
+  "enhancedContent": "# ${title} - Deep Technical Analysis\\n\\n## Executive Summary\\n[High-level overview of the project, its purpose, and key architectural decisions]\\n\\n## System Architecture\\n[Detailed system architecture including:\\n- Component relationships and data flow\\n- Technology stack and framework choices\\n- Design patterns and architectural principles\\n- System boundaries and interfaces]\\n\\n## Core Implementation\\n[Deep dive into the core implementation including:\\n- Key algorithms and data structures\\n- Critical code paths and logic\\n- Performance-critical components\\n- Error handling and edge cases]\\n\\n## Data Flow & Processing\\n[Analysis of data processing including:\\n- Data ingestion and transformation\\n- Storage strategies and persistence\\n- Caching mechanisms and optimization\\n- Data validation and integrity]\\n\\n## Performance Analysis\\n[Comprehensive performance analysis including:\\n- Bottlenecks and optimization opportunities\\n- Resource utilization patterns\\n- Scalability considerations\\n- Performance monitoring and metrics]\\n\\n## Security & Reliability\\n[Security and reliability analysis including:\\n- Security vulnerabilities and mitigations\\n- Authentication and authorization\\n- Data protection and privacy\\n- Fault tolerance and disaster recovery]\\n\\n## Development & Deployment\\n[Development and deployment analysis including:\\n- Build and deployment pipeline\\n- Testing strategies and coverage\\n- Environment management\\n- CI/CD practices]\\n\\n## Integration & Ecosystem\\n[Integration and ecosystem analysis including:\\n- External dependencies and APIs\\n- Third-party integrations\\n- Ecosystem relationships\\n- API design and versioning]\\n\\n## Code Quality & Technical Debt\\n[Code quality and technical debt analysis including:\\n- Code organization and structure\\n- Documentation quality\\n- Technical debt assessment\\n- Maintainability factors]\\n\\n## Future Roadmap\\n[Future considerations including:\\n- Technical roadmap and evolution\\n- Scalability challenges\\n- Potential improvements\\n- Technology migration strategies]\\n\\n## Technical Insights\\n[Key technical insights including:\\n- Innovative patterns and approaches\\n- Lessons learned and best practices\\n- Technical challenges overcome\\n- Architectural decisions rationale]",
+  "keyPoints": ["Architectural insight 1", "Technical pattern 2", "Performance consideration 3", "Security aspect 4", "Scalability factor 5"],
+  "suggestedImprovements": ["Architecture improvement 1", "Performance optimization 2", "Security enhancement 3", "Scalability upgrade 4", "Development workflow improvement 5"]
 }
 
 Rules:
@@ -246,12 +246,16 @@ Rules:
 2. No text before or after the JSON
 3. Use double quotes for all strings
 4. Escape any quotes within strings with backslash
-5. The summary should be 2-3 sentences maximum
-6. Include 3-5 key points as an array of strings
-7. Include 3-5 suggested improvements as an array of strings
-8. The enhancedContent should be the improved version of the original content
+5. The summary should be 3-4 sentences covering technical depth
+6. Include 5 key technical insights as an array of strings
+7. Include 5 architectural/technical improvements as an array of strings
+8. The enhancedContent should follow DeepWiki's comprehensive deep dive format with detailed technical sections
+9. Focus on technical depth, architectural patterns, implementation details, and professional analysis
+10. Include specific code patterns, design decisions, and technical insights
+11. Write in a professional, analytical tone suitable for technical documentation
+12. Provide actionable insights and technical recommendations
 
-Focus on making the documentation more accessible, well-structured, and comprehensive while maintaining the original intent and technical accuracy.`
+Create deep dive documentation that matches DeepWiki's level of technical detail, comprehensive analysis, and professional presentation.`
 
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
@@ -330,7 +334,7 @@ async function generateRepositorySummary(
   try {
     const pageTitles = pages.map(p => p.title).join(', ')
     
-    const prompt = `You are analyzing a GitHub repository to create a comprehensive summary.
+    const prompt = `You are analyzing a GitHub repository to create a comprehensive technical deep dive summary similar to DeepWiki's analysis style.
 
 Repository Information:
 - Name: ${repoData.name}
@@ -340,13 +344,15 @@ Repository Information:
 - Topics: ${repoData.topics?.join(', ') || 'None'}
 - Documentation Pages: ${pageTitles}
 
-Please provide a concise but comprehensive summary of this repository (2-3 paragraphs) that would help someone understand:
-1. What this project is about
-2. Its main features and purpose
-3. The quality and comprehensiveness of its documentation
-4. Who might find it useful
+Please provide a comprehensive technical analysis summary (4-5 paragraphs) that covers:
+1. **Executive Overview**: High-level project purpose, key architectural decisions, and technology choices
+2. **System Architecture**: Component relationships, data flow patterns, and architectural principles
+3. **Technical Implementation**: Key algorithms, design patterns, and implementation strategies
+4. **Performance & Scalability**: Architecture decisions impacting performance, scalability considerations, and optimization opportunities
+5. **Development & Quality**: Code quality indicators, testing strategies, development practices, and technical debt assessment
+6. **Technical Insights**: Unique architectural patterns, innovative approaches, technical challenges, and lessons learned
 
-Write in a clear, professional tone suitable for a technical audience.`
+Write in a professional, analytical tone suitable for software architects, senior developers, and technical decision-makers. Focus on technical depth, architectural insights, and actionable recommendations similar to DeepWiki's comprehensive analysis style.`
 
     const response = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',

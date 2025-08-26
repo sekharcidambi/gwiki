@@ -38,7 +38,7 @@ export default function Home() {
   }
 
   if (wikiData) {
-    return <WikiGenerator wikiData={wikiData} repoUrl={repoUrl} />
+    return <WikiGenerator wikiData={wikiData} repoUrl={repoUrl} onBack={() => setWikiData(null)} />
   }
 
   return (
@@ -49,7 +49,7 @@ export default function Home() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-2">
               <BookOpen className="h-8 w-8 text-primary-600" />
-              <h1 className="text-2xl font-bold text-gray-900">GWiki</h1>
+              <h1 className="text-2xl font-bold text-gray-900">DeepDive</h1>
             </div>
             <div className="flex items-center space-x-4">
               <a
@@ -70,11 +70,11 @@ export default function Home() {
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 sm:text-6xl">
             Instant GitHub Repository
-            <span className="text-primary-600"> Wikis</span>
+            <span className="text-primary-600"> Deep Dives</span>
           </h1>
           <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
-            Transform any GitHub repository into a beautiful, AI-enhanced wiki in seconds. 
-            Powered by Claude AI for intelligent content summarization and documentation enhancement.
+            Transform any GitHub repository into a comprehensive technical deep dive in seconds. 
+            Powered by Claude AI for intelligent architectural analysis and technical insights.
           </p>
           
           <div className="mt-8">
@@ -90,7 +90,7 @@ export default function Home() {
             </div>
             <h3 className="mt-4 text-lg font-semibold text-gray-900">AI Enhanced</h3>
             <p className="mt-2 text-gray-600">
-              Powered by Claude AI for intelligent content summarization, enhancement, and key insights.
+              Powered by Claude AI for intelligent architectural analysis, technical insights, and deep code understanding.
             </p>
           </div>
 
@@ -143,9 +143,9 @@ export default function Home() {
               <div className="bg-primary-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-primary-600">3</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Get Your Wiki</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Get Your Deep Dive</h3>
               <p className="mt-2 text-gray-600">
-                Receive a beautiful, organized wiki with search functionality and navigation.
+                Receive a comprehensive technical analysis with architectural insights and detailed documentation.
               </p>
             </div>
           </div>

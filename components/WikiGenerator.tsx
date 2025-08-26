@@ -37,9 +37,10 @@ interface WikiData {
 interface WikiGeneratorProps {
   wikiData: WikiData
   repoUrl: string
+  onBack?: () => void
 }
 
-export default function WikiGenerator({ wikiData, repoUrl }: WikiGeneratorProps) {
+export default function WikiGenerator({ wikiData, repoUrl, onBack }: WikiGeneratorProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -78,16 +79,16 @@ export default function WikiGenerator({ wikiData, repoUrl }: WikiGeneratorProps)
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => window.location.reload()}
+                onClick={onBack || (() => window.location.reload())}
                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
               >
                 <ArrowLeft className="h-5 w-5" />
-                <span>New Wiki</span>
+                <span>New Deep Dive</span>
               </button>
               <div className="h-6 w-px bg-gray-300" />
               <div className="flex items-center space-x-2">
                 <BookOpen className="h-6 w-6 text-primary-600" />
-                <h1 className="text-xl font-semibold text-gray-900">GWiki</h1>
+                <h1 className="text-xl font-semibold text-gray-900">DeepDive</h1>
               </div>
             </div>
             
@@ -96,7 +97,7 @@ export default function WikiGenerator({ wikiData, repoUrl }: WikiGeneratorProps)
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search wiki..."
+                  placeholder="Search deep dive..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
