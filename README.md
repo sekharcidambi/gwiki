@@ -19,7 +19,7 @@ GWiki is a modern web application that instantly generates beautiful, AI-enhance
 - **Styling**: Tailwind CSS
 - **Markdown**: Marked.js with syntax highlighting
 - **GitHub API**: Octokit.js
-- **AI**: Anthropic Claude API (Haiku model)
+- **AI**: Anthropic Claude API (Sonnet 4 model)
 - **Icons**: Lucide React
 
 ## Getting Started
@@ -75,7 +75,7 @@ npm run dev
 
 1. **Repository Analysis**: The app fetches repository metadata and structure
 2. **Documentation Discovery**: Automatically finds README files, docs, and markdown files
-3. **AI Enhancement**: Claude AI analyzes and enhances content with summaries and improvements
+3. **AI Enhancement**: Claude Sonnet 4 analyzes and enhances content with summaries and improvements
 4. **Content Processing**: Converts markdown to HTML with syntax highlighting
 5. **Wiki Generation**: Creates a navigable wiki with search functionality and AI insights
 

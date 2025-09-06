@@ -258,7 +258,7 @@ Rules:
 Create deep dive documentation that matches DeepWiki's level of technical detail, comprehensive analysis, and professional presentation.`
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
+              model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       temperature: 0.3,
       messages: [
@@ -355,7 +355,7 @@ Please provide a comprehensive technical analysis summary (4-5 paragraphs) that 
 Write in a professional, analytical tone suitable for software architects, senior developers, and technical decision-makers. Focus on technical depth, architectural insights, and actionable recommendations similar to DeepWiki's comprehensive analysis style.`
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
+              model: 'claude-sonnet-4-20250514',
       max_tokens: 800,
       temperature: 0.3,
       messages: [

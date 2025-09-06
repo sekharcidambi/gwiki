@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Github, Search, BookOpen, Zap, Users, Star } from 'lucide-react'
 import RepoInput from '@/components/RepoInput'
-import WikiGenerator from '@/components/WikiGenerator'
+import EnhancedWikiGenerator from '@/components/EnhancedWikiGenerator'
 
 export default function Home() {
   const [repoUrl, setRepoUrl] = useState('')
@@ -15,7 +15,7 @@ export default function Home() {
     setRepoUrl(url)
     
     try {
-      const response = await fetch('/api/generate-wiki', {
+      const response = await fetch('/api/analyze-repo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,18 +27,18 @@ export default function Home() {
         const data = await response.json()
         setWikiData(data)
       } else {
-        throw new Error('Failed to generate wiki')
+        throw new Error('Failed to analyze repository')
       }
     } catch (error) {
-      console.error('Error generating wiki:', error)
-      alert('Failed to generate wiki. Please check the repository URL and try again.')
+      console.error('Error analyzing repository:', error)
+      alert('Failed to analyze repository. Please check the repository URL and try again.')
     } finally {
       setIsGenerating(false)
     }
   }
 
   if (wikiData) {
-    return <WikiGenerator wikiData={wikiData} repoUrl={repoUrl} onBack={() => setWikiData(null)} />
+    return <EnhancedWikiGenerator wikiData={wikiData} repoUrl={repoUrl} onBack={() => setWikiData(null)} />
   }
 
   return (
@@ -49,7 +49,8 @@ export default function Home() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-2">
               <BookOpen className="h-8 w-8 text-primary-600" />
-              <h1 className="text-2xl font-bold text-gray-900">DeepDive</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Glover Labs</h1>
+              <span className="text-lg text-gray-500">DeepDive</span>
             </div>
             <div className="flex items-center space-x-4">
               <a
@@ -69,12 +70,12 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 sm:text-6xl">
-            Instant GitHub Repository
-            <span className="text-primary-600"> Deep Dives</span>
+            GitHub Repository
+            <span className="text-primary-600"> Analysis & Documentation</span>
           </h1>
           <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
-            Transform any GitHub repository into a comprehensive technical deep dive in seconds. 
-            Powered by Claude AI for intelligent architectural analysis and technical insights.
+            Combine repository metadata analysis with intelligent documentation structure generation. 
+            Get comprehensive technical insights, business domain classification, and structured documentation in one unified interface.
           </p>
           
           <div className="mt-8">
@@ -88,9 +89,9 @@ export default function Home() {
             <div className="flex justify-center">
               <Zap className="h-12 w-12 text-primary-600" />
             </div>
-            <h3 className="mt-4 text-lg font-semibold text-gray-900">AI Enhanced</h3>
+            <h3 className="mt-4 text-lg font-semibold text-gray-900">Repository Analysis</h3>
             <p className="mt-2 text-gray-600">
-              Powered by Claude AI for intelligent architectural analysis, technical insights, and deep code understanding.
+              Comprehensive metadata extraction including business domain, tech stack, architecture patterns, and setup instructions.
             </p>
           </div>
 
@@ -98,9 +99,9 @@ export default function Home() {
             <div className="flex justify-center">
               <Search className="h-12 w-12 text-primary-600" />
             </div>
-            <h3 className="mt-4 text-lg font-semibold text-gray-900">Smart Search</h3>
+            <h3 className="mt-4 text-lg font-semibold text-gray-900">Documentation Structure</h3>
             <p className="mt-2 text-gray-600">
-              Full-text search across all documentation with AI-powered insights and summaries.
+              AI-generated documentation structure with organized sections and subsections tailored to your repository.
             </p>
           </div>
 
@@ -108,9 +109,9 @@ export default function Home() {
             <div className="flex justify-center">
               <Users className="h-12 w-12 text-primary-600" />
             </div>
-            <h3 className="mt-4 text-lg font-semibold text-gray-900">Team Ready</h3>
+            <h3 className="mt-4 text-lg font-semibold text-gray-900">Unified Interface</h3>
             <p className="mt-2 text-gray-600">
-              Share AI-enhanced wikis with your team. Perfect for onboarding and knowledge sharing.
+              Single interface combining repository metadata, documentation structure, and enhanced content with wiki-like navigation.
             </p>
           </div>
         </div>
@@ -134,18 +135,18 @@ export default function Home() {
               <div className="bg-primary-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-primary-600">2</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">AI Analysis</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Repository Analysis</h3>
               <p className="mt-2 text-gray-600">
-                Claude AI analyzes the repository structure, README files, and documentation for intelligent enhancement.
+                System analyzes repository structure, extracts metadata, determines business domain, and identifies tech stack.
               </p>
             </div>
             <div className="text-center">
               <div className="bg-primary-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-primary-600">3</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Get Your Deep Dive</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Documentation Structure</h3>
               <p className="mt-2 text-gray-600">
-                Receive a comprehensive technical analysis with architectural insights and detailed documentation.
+                AI generates tailored documentation structure and creates comprehensive content for each section.
               </p>
             </div>
           </div>
