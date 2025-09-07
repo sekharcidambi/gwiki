@@ -452,18 +452,21 @@ async function fetchAndEnhanceDocumentation(owner: string, repo: string, docStru
     if (Array.isArray(docStructure) && docStructure.length > 0) {
       const rootItem = docStructure[0]
       
-      // Process the root item's children recursively
-      const processChildren = async (children: any[], parentPath: string = '') => {
-        for (const child of children) {
-          const childPath = parentPath ? `${parentPath}/${child.title.toLowerCase().replace(/\s+/g, '-')}` : child.title.toLowerCase().replace(/\s+/g, '-')
+      // Process ALL sections recursively, including deeply nested ones
+      const processAllSections = async (items: any[], parentPath: string = '', parentTitle: string = '') => {
+        for (const item of items) {
+          const itemPath = parentPath ? `${parentPath}/${item.title.toLowerCase().replace(/\s+/g, '-')}` : item.title.toLowerCase().replace(/\s+/g, '-')
+          const sectionTitle = parentTitle ? `${parentTitle} > ${item.title}` : item.title
           
           try {
+            console.log(`🔄 Generating content for: ${sectionTitle}`)
+            
             // Generate additional context based on the specific section
-            const additionalContext = generateSectionSpecificContext(child.title, repoAnalysis)
+            const additionalContext = generateSectionSpecificContext(item.title, repoAnalysis)
             
             const enhancedContent = await generateEnhancedSectionContent(
-              'Documentation',
-              child.title,
+              parentTitle || 'Documentation',
+              item.title,
               owner,
               repo,
               repoAnalysis,
@@ -472,26 +475,40 @@ async function fetchAndEnhanceDocumentation(owner: string, repo: string, docStru
             )
             
             pages.push({
-              title: child.title,
+              title: item.title,
               content: enhancedContent,
-              path: childPath,
+              path: itemPath,
               type: 'docs',
-              section: 'Documentation',
-              subsection: child.title,
+              section: parentTitle || 'Documentation',
+              subsection: item.title,
+              fullPath: sectionTitle
             })
+            
+            console.log(`✅ Generated content for: ${sectionTitle}`)
+            
+            // Add a small delay to prevent rate limiting
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
           } catch (error) {
-            console.error(`Failed to generate content for ${child.title}:`, error)
+            console.error(`❌ Failed to generate content for ${sectionTitle}:`, error)
+            
+            // If it's a rate limit error, wait longer before continuing
+            if (error && typeof error === 'object' && 'status' in error && error.status === 429) {
+              console.log('⏳ Rate limit hit, waiting 10 seconds before continuing...')
+              await new Promise(resolve => setTimeout(resolve, 10000))
+            }
           }
           
           // Recursively process nested children
-          if (child.children && Array.isArray(child.children)) {
-            await processChildren(child.children, childPath)
+          if (item.children && Array.isArray(item.children) && item.children.length > 0) {
+            await processAllSections(item.children, itemPath, sectionTitle)
           }
         }
       }
       
+      // Process all root-level items and their children
       if (rootItem.children && Array.isArray(rootItem.children)) {
-        await processChildren(rootItem.children)
+        await processAllSections(rootItem.children)
       }
     } else if (docStructure.sections && Array.isArray(docStructure.sections)) {
       // Fallback: Handle old format (sections with subsections)
@@ -526,6 +543,9 @@ async function fetchAndEnhanceDocumentation(owner: string, repo: string, docStru
         }
       }
     }
+
+    console.log(`📊 Total pages generated: ${pages.length}`)
+    console.log(`📋 Pages created:`, pages.map(p => p.fullPath || p.title))
 
   } catch (error) {
     console.error('Error fetching documentation:', error)
@@ -673,21 +693,30 @@ function buildNavigationStructure(docStructure: any, pages: any[]) {
   if (Array.isArray(docStructure) && docStructure.length > 0) {
     const rootItem = docStructure[0]
     
-    // Create a hierarchical structure that preserves the nesting
-    const buildHierarchy = (items: any[], parentPath: string = ''): any[] => {
+    // Create a hierarchical structure that preserves the nesting and includes all generated pages
+    const buildHierarchy = (items: any[], parentPath: string = '', parentTitle: string = ''): any[] => {
       const result: any[] = []
       for (const item of items) {
         const itemPath = parentPath ? `${parentPath}/${item.title.toLowerCase().replace(/\s+/g, '-')}` : item.title.toLowerCase().replace(/\s+/g, '-')
+        const sectionTitle = parentTitle ? `${parentTitle} > ${item.title}` : item.title
+        
+        // Find the corresponding page for this item
+        const correspondingPage = pages.find(page => 
+          page.fullPath === sectionTitle || 
+          (page.section === (parentTitle || 'Documentation') && page.subsection === item.title)
+        )
         
         const childItem: any = {
           title: item.title,
           path: itemPath,
           type: 'docs',
+          hasContent: !!correspondingPage,
+          content: correspondingPage?.content || null
         }
         
         // If this item has children, add them as nested children
         if (item.children && Array.isArray(item.children) && item.children.length > 0) {
-          childItem.children = buildHierarchy(item.children, itemPath)
+          childItem.children = buildHierarchy(item.children, itemPath, sectionTitle)
         }
         
         result.push(childItem)
@@ -714,6 +743,8 @@ function buildNavigationStructure(docStructure: any, pages: any[]) {
             title: page.subsection,
             path: page.path,
             type: page.type,
+            hasContent: true,
+            content: page.content
           }))
         })
       } else {
