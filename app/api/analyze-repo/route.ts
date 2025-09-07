@@ -435,8 +435,12 @@ async function fetchAndEnhanceDocumentation(owner: string, repo: string, docStru
   const pages = []
 
   try {
-    // Fetch README content for context
+    // Fetch README content and other key files for context
     let readmeContent = ''
+    let packageJsonContent = ''
+    let dockerfileContent = ''
+    let dockerComposeContent = ''
+    
     try {
       const readmeResponse = await octokit.rest.repos.getReadme({
         owner,
@@ -446,6 +450,58 @@ async function fetchAndEnhanceDocumentation(owner: string, repo: string, docStru
     } catch (error) {
       console.log('No README found or accessible')
       readmeContent = 'No README content available'
+    }
+
+    // Try to fetch package.json for additional context
+    try {
+      const packageJsonResponse = await octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path: 'package.json',
+      })
+      if (Array.isArray(packageJsonResponse.data)) {
+        // This shouldn't happen for package.json, but handle it
+        packageJsonContent = 'package.json is a directory (unexpected)'
+      } else {
+        packageJsonContent = Buffer.from(packageJsonResponse.data.content, 'base64').toString()
+      }
+    } catch (error) {
+      console.log('No package.json found or accessible')
+      packageJsonContent = 'No package.json content available'
+    }
+
+    // Try to fetch Dockerfile for additional context
+    try {
+      const dockerfileResponse = await octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path: 'Dockerfile',
+      })
+      if (Array.isArray(dockerfileResponse.data)) {
+        dockerfileContent = 'Dockerfile is a directory (unexpected)'
+      } else {
+        dockerfileContent = Buffer.from(dockerfileResponse.data.content, 'base64').toString()
+      }
+    } catch (error) {
+      console.log('No Dockerfile found or accessible')
+      dockerfileContent = 'No Dockerfile content available'
+    }
+
+    // Try to fetch docker-compose.yml for additional context
+    try {
+      const dockerComposeResponse = await octokit.rest.repos.getContent({
+        owner,
+        repo,
+        path: 'docker-compose.yml',
+      })
+      if (Array.isArray(dockerComposeResponse.data)) {
+        dockerComposeContent = 'docker-compose.yml is a directory (unexpected)'
+      } else {
+        dockerComposeContent = Buffer.from(dockerComposeResponse.data.content, 'base64').toString()
+      }
+    } catch (error) {
+      console.log('No docker-compose.yml found or accessible')
+      dockerComposeContent = 'No docker-compose.yml content available'
     }
 
     // Handle ADocS format: array with root object containing children
@@ -471,7 +527,10 @@ async function fetchAndEnhanceDocumentation(owner: string, repo: string, docStru
               repo,
               repoAnalysis,
               readmeContent,
-              additionalContext
+              additionalContext,
+              packageJsonContent,
+              dockerfileContent,
+              dockerComposeContent
             )
             
             pages.push({
@@ -525,7 +584,10 @@ async function fetchAndEnhanceDocumentation(owner: string, repo: string, docStru
                 repo,
                 repoAnalysis,
                 readmeContent,
-                additionalContext
+                additionalContext,
+                packageJsonContent,
+                dockerfileContent,
+                dockerComposeContent
               )
               
               pages.push({
@@ -558,40 +620,103 @@ function generateSectionSpecificContext(sectionTitle: string, repoAnalysis: any)
   const context = []
   
   // Add section-specific context based on the title
-  if (sectionTitle.toLowerCase().includes('getting started') || sectionTitle.toLowerCase().includes('installation')) {
+  if (sectionTitle.toLowerCase().includes('getting started') || sectionTitle.toLowerCase().includes('installation') || sectionTitle.toLowerCase().includes('quick start')) {
     context.push(`
 GETTING STARTED CONTEXT:
-- Use the actual setup commands: ${repoAnalysis.setup.install || 'Not specified'}
-- Reference the actual technology stack for installation requirements
-- Include the actual run command: ${repoAnalysis.setup.run || 'Not specified'}
-- Mention the actual test command: ${repoAnalysis.setup.test || 'Not specified'}
+- This repository is a ${repoAnalysis.business_domain} project
+- Primary languages: ${repoAnalysis.tech_stack.languages.join(', ')}
+- Installation command: ${repoAnalysis.setup.install || 'Not specified'}
+- Run command: ${repoAnalysis.setup.run || 'Not specified'}
+- Test command: ${repoAnalysis.setup.test || 'Not specified'}
+- Architecture pattern: ${repoAnalysis.architecture.pattern}
+- Specific setup requirements based on the technology stack: ${JSON.stringify(repoAnalysis.tech_stack)}
 `)
   }
   
-  if (sectionTitle.toLowerCase().includes('architecture') || sectionTitle.toLowerCase().includes('design')) {
+  if (sectionTitle.toLowerCase().includes('architecture') || sectionTitle.toLowerCase().includes('design') || sectionTitle.toLowerCase().includes('system') || sectionTitle.toLowerCase().includes('framework')) {
     context.push(`
 ARCHITECTURE CONTEXT:
-- This repository uses: ${repoAnalysis.architecture.pattern || 'Not specified'}
-- Architecture description: ${repoAnalysis.architecture.description || 'Not specified'}
-- Technology stack: ${JSON.stringify(repoAnalysis.tech_stack)}
+- This repository implements a ${repoAnalysis.architecture.pattern} architecture
+- Architecture description: ${repoAnalysis.architecture.description}
+- Technology stack breakdown:
+  * Languages: ${repoAnalysis.tech_stack.languages.join(', ')}
+  * Frontend: ${repoAnalysis.tech_stack.frontend.join(', ')}
+  * Backend: ${repoAnalysis.tech_stack.backend.join(', ')}
+  * Databases: ${repoAnalysis.tech_stack.databases.join(', ')}
+  * DevOps: ${repoAnalysis.tech_stack.devops.join(', ')}
+- Business domain: ${repoAnalysis.business_domain}
+- Repository status: ${repoAnalysis.metadata.status} (${repoAnalysis.metadata.stars} stars, ${repoAnalysis.metadata.forks} forks)
 `)
   }
   
-  if (sectionTitle.toLowerCase().includes('api') || sectionTitle.toLowerCase().includes('endpoint')) {
+  if (sectionTitle.toLowerCase().includes('api') || sectionTitle.toLowerCase().includes('endpoint') || sectionTitle.toLowerCase().includes('service')) {
     context.push(`
-API CONTEXT:
-- Backend technology: ${repoAnalysis.tech_stack.backend.join(', ') || 'Not specified'}
-- Frontend technology: ${repoAnalysis.tech_stack.frontend.join(', ') || 'Not specified'}
-- Database: ${repoAnalysis.tech_stack.databases.join(', ') || 'Not specified'}
+API/SERVICE CONTEXT:
+- Backend technology stack: ${repoAnalysis.tech_stack.backend.join(', ')}
+- Frontend technology stack: ${repoAnalysis.tech_stack.frontend.join(', ')}
+- Database technologies: ${repoAnalysis.tech_stack.databases.join(', ')}
+- Primary programming languages: ${repoAnalysis.tech_stack.languages.join(', ')}
+- Architecture pattern: ${repoAnalysis.architecture.pattern}
+- Business domain: ${repoAnalysis.business_domain}
 `)
   }
   
-  if (sectionTitle.toLowerCase().includes('deployment') || sectionTitle.toLowerCase().includes('production')) {
+  if (sectionTitle.toLowerCase().includes('deployment') || sectionTitle.toLowerCase().includes('production') || sectionTitle.toLowerCase().includes('operations')) {
     context.push(`
 DEPLOYMENT CONTEXT:
-- DevOps tools: ${repoAnalysis.tech_stack.devops.join(', ') || 'Not specified'}
-- Architecture pattern: ${repoAnalysis.architecture.pattern || 'Not specified'}
-- License: ${repoAnalysis.metadata.license || 'Not specified'}
+- DevOps tools and technologies: ${repoAnalysis.tech_stack.devops.join(', ')}
+- Architecture pattern: ${repoAnalysis.architecture.pattern}
+- License: ${repoAnalysis.metadata.license}
+- Repository status: ${repoAnalysis.metadata.status}
+- Technology stack for deployment: ${JSON.stringify(repoAnalysis.tech_stack)}
+- Business domain: ${repoAnalysis.business_domain}
+`)
+  }
+  
+  if (sectionTitle.toLowerCase().includes('business') || sectionTitle.toLowerCase().includes('domain') || sectionTitle.toLowerCase().includes('process') || sectionTitle.toLowerCase().includes('enterprise')) {
+    context.push(`
+BUSINESS DOMAIN CONTEXT:
+- Primary business domain: ${repoAnalysis.business_domain}
+- Technology stack supporting business processes: ${JSON.stringify(repoAnalysis.tech_stack)}
+- Architecture pattern: ${repoAnalysis.architecture.pattern}
+- Repository purpose: ${repoAnalysis.overview}
+- Repository metadata: ${repoAnalysis.metadata.stars} stars, ${repoAnalysis.metadata.forks} forks, ${repoAnalysis.metadata.license} license
+`)
+  }
+  
+  if (sectionTitle.toLowerCase().includes('development') || sectionTitle.toLowerCase().includes('customization') || sectionTitle.toLowerCase().includes('extension')) {
+    context.push(`
+DEVELOPMENT CONTEXT:
+- Development technology stack: ${JSON.stringify(repoAnalysis.tech_stack)}
+- Setup commands for development:
+  * Install: ${repoAnalysis.setup.install}
+  * Run: ${repoAnalysis.setup.run}
+  * Test: ${repoAnalysis.setup.test}
+- Architecture pattern: ${repoAnalysis.architecture.pattern}
+- Business domain: ${repoAnalysis.business_domain}
+- Repository status: ${repoAnalysis.metadata.status}
+`)
+  }
+  
+  if (sectionTitle.toLowerCase().includes('security') || sectionTitle.toLowerCase().includes('compliance')) {
+    context.push(`
+SECURITY CONTEXT:
+- Technology stack security considerations: ${JSON.stringify(repoAnalysis.tech_stack)}
+- Architecture pattern: ${repoAnalysis.architecture.pattern}
+- License: ${repoAnalysis.metadata.license}
+- Business domain: ${repoAnalysis.business_domain}
+- Repository status: ${repoAnalysis.metadata.status}
+`)
+  }
+  
+  if (sectionTitle.toLowerCase().includes('data') || sectionTitle.toLowerCase().includes('model') || sectionTitle.toLowerCase().includes('entity')) {
+    context.push(`
+DATA CONTEXT:
+- Database technologies: ${repoAnalysis.tech_stack.databases.join(', ')}
+- Backend technologies: ${repoAnalysis.tech_stack.backend.join(', ')}
+- Primary languages: ${repoAnalysis.tech_stack.languages.join(', ')}
+- Architecture pattern: ${repoAnalysis.architecture.pattern}
+- Business domain: ${repoAnalysis.business_domain}
 `)
   }
   
@@ -605,7 +730,10 @@ async function generateEnhancedSectionContent(
   repo: string,
   repoAnalysis: any,
   readmeContent: string,
-  additionalContext: string = ''
+  additionalContext: string = '',
+  packageJsonContent: string = '',
+  dockerfileContent: string = '',
+  dockerComposeContent: string = ''
 ) {
   try {
     // Build comprehensive context from actual repository data
@@ -639,39 +767,63 @@ REPOSITORY METADATA:
 README CONTENT:
 ${readmeContent}
 
+PACKAGE.JSON CONTENT:
+${packageJsonContent}
+
+DOCKERFILE CONTENT:
+${dockerfileContent}
+
+DOCKER-COMPOSE.YML CONTENT:
+${dockerComposeContent}
+
 ${additionalContext}
 `
 
-    const prompt = `You are creating comprehensive documentation for a GitHub repository. 
+    const prompt = `You are creating comprehensive, detailed documentation for a specific GitHub repository. 
 
 CRITICAL INSTRUCTIONS:
-- Generate content SPECIFIC to the actual repository described below
+- Generate EXTENSIVE, DESCRIPTIVE content SPECIFIC to the actual repository described below
+- Create detailed narratives with 3-5 paragraphs minimum per section
 - Use ONLY the information provided about this specific repository
 - Do NOT use generic knowledge or information about similar projects
 - Base your content on the actual technology stack, architecture, and setup commands provided
 - Reference the actual README content when relevant
 - If information is missing or "Not specified", acknowledge this limitation
 - Be specific about the actual implementation, not theoretical concepts
+- Write in a professional, technical documentation style
+- Include specific details about how THIS repository implements concepts
 
 REPOSITORY CONTEXT:
 ${repositoryContext}
 
-TASK: Create detailed content for the section "${section}" and subsection "${subsection}".
+TASK: Create comprehensive, detailed content for the section "${section}" and subsection "${subsection}".
 
-REQUIREMENTS:
-- Provide practical, actionable content specific to THIS repository
-- Include code examples based on the actual technology stack
-- Reference the actual setup commands and architecture
-- Explain how this specific repository implements the concepts
-- Include best practices relevant to the actual tech stack used
-- Mention any limitations or considerations specific to this implementation
+REQUIREMENTS FOR CONTENT:
+- Write 3-5 detailed paragraphs (minimum 200-300 words per section)
+- Provide specific, actionable content tailored to THIS repository
+- Include detailed explanations of how this specific repository implements the concepts
+- Reference the actual setup commands, architecture patterns, and technology stack
+- Explain the business context and technical decisions specific to this project
+- Include practical examples based on the actual technology stack used
+- Mention specific implementation details, configurations, or patterns used
+- Discuss any unique aspects or considerations specific to this implementation
+- Use professional technical writing with clear explanations
+- Include subsections with headers for better organization
+- Provide context about why certain technologies or patterns were chosen for this specific project
 
-Format the response as markdown.`
+CONTENT STRUCTURE:
+- Start with a clear introduction explaining what this section covers for THIS specific repository
+- Provide detailed technical explanations with specific implementation details
+- Include practical examples and use cases specific to this project
+- Explain the business value and technical benefits for this specific implementation
+- Conclude with key takeaways or next steps specific to this repository
+
+Format the response as detailed markdown with proper headers, bullet points, and code blocks where appropriate.`
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500, // Increased for more detailed content
-      temperature: 0.2, // Lower temperature for more focused, factual content
+      max_tokens: 3000, // Significantly increased for detailed narratives
+      temperature: 0.1, // Very low temperature for focused, factual content
       messages: [{ role: 'user', content: prompt }],
     })
 
