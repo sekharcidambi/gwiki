@@ -162,6 +162,7 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
   // Remove tab state since we're only showing ADocS content
 
   const filteredPages = useMemo(() => {
+    if (!wikiData.pages) return []
     if (!searchQuery.trim()) return wikiData.pages
     
     const query = searchQuery.toLowerCase()
@@ -174,8 +175,8 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
   }, [wikiData.pages, searchQuery])
 
   const currentPage = selectedPage 
-    ? wikiData.pages.find(p => p.path === selectedPage)
-    : wikiData.pages[0]
+    ? wikiData.pages?.find(p => p.path === selectedPage)
+    : wikiData.pages?.[0]
 
   const toggleSection = (sectionTitle: string) => {
     const newExpanded = new Set(expandedSections)
@@ -274,7 +275,7 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
                 </div>
                 
                 {/* Generated Files Info */}
-                {wikiData.generatedFiles && wikiData.generatedFiles.hasMarkdownFiles && (
+                {(wikiData as any).generatedFiles && (wikiData as any).generatedFiles.hasMarkdownFiles && (
                   <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded-md">
                     <div className="flex items-center space-x-2">
                       <FileText className="h-4 w-4 text-green-600" />

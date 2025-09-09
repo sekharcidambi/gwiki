@@ -4,11 +4,108 @@ import { useState } from 'react'
 import { Github, Search, BookOpen, Zap, Users, Star } from 'lucide-react'
 import RepoInput from '@/components/RepoInput'
 import EnhancedWikiGenerator from '@/components/EnhancedWikiGenerator'
+import RepositoryTiles from '@/components/RepositoryTiles'
+import RepositoryDocumentation from '@/components/RepositoryDocumentation'
+
+interface Repository {
+  name: string
+  github_url: string
+  latest_version: string
+  generated_at: string
+  documentation_type: string
+  available_sections: string[]
+}
+
+interface DocumentationPage {
+  title: string
+  content: string
+  path: string
+  type: 'readme' | 'docs' | 'code' | 'other'
+  section: string
+  subsection: string
+}
+
+interface WikiData {
+  repository: any
+  documentationStructure: any
+  pages: DocumentationPage[]
+  navigation: any[]
+}
+
+// Transform analysis service response to WikiData structure
+function transformAnalysisToWikiData(analysisData: any) {
+  const analysis = analysisData.analysis || {}
+  const docStructure = analysisData.documentation_structure || {}
+  
+  // Extract repository metadata
+  const repository = {
+    name: analysis.name || 'Unknown',
+    description: analysis.description || '',
+    owner: analysis.github_url?.split('/')[3] || 'Unknown',
+    stars: analysis.metadata?.stars || 0,
+    language: analysis.tech_stack?.languages?.[0] || 'Unknown',
+    topics: analysis.metadata?.topics || [],
+    createdAt: analysis.metadata?.created_at || '',
+    updatedAt: analysis.metadata?.updated_at || '',
+    businessDomain: analysis.business_domain || 'Unknown',
+    techStack: {
+      languages: analysis.tech_stack?.languages || [],
+      frontend: analysis.tech_stack?.frontend || [],
+      backend: analysis.tech_stack?.backend || [],
+      databases: analysis.tech_stack?.databases || [],
+      devops: analysis.tech_stack?.devops || []
+    },
+    architecture: {
+      pattern: analysis.architecture?.pattern || 'Unknown',
+      description: analysis.architecture?.description || ''
+    },
+    setup: {
+      requirements: analysis.tech_stack?.languages || [],
+      installation: 'See README for installation instructions',
+      configuration: 'See documentation for configuration details'
+    }
+  }
+
+  // Transform documentation structure
+  const documentationStructure = {
+    sections: docStructure.sections || []
+  }
+
+  // Create pages from enhanced sections
+  const pages: DocumentationPage[] = []
+  if (analysisData.enhanced_sections) {
+    Object.entries(analysisData.enhanced_sections).forEach(([sectionTitle, content]) => {
+      pages.push({
+        title: sectionTitle,
+        content: content as string,
+        section: 'Overview',
+        subsection: sectionTitle,
+        path: sectionTitle.toLowerCase().replace(/\s+/g, '-'),
+        type: 'docs' as const
+      })
+    })
+  }
+
+  // Create navigation structure
+  const navigation = pages.map(page => ({
+    title: page.title,
+    path: page.path,
+    children: []
+  }))
+
+  return {
+    repository,
+    documentationStructure,
+    pages,
+    navigation
+  }
+}
 
 export default function Home() {
   const [repoUrl, setRepoUrl] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
-  const [wikiData, setWikiData] = useState(null)
+  const [wikiData, setWikiData] = useState<WikiData | null>(null)
+  const [selectedRepository, setSelectedRepository] = useState<Repository | null>(null)
 
   const handleGenerateWiki = async (url: string) => {
     setIsGenerating(true)
@@ -25,7 +122,22 @@ export default function Home() {
       
       if (response.ok) {
         const data = await response.json()
-        setWikiData(data)
+        
+        if (data.success) {
+          if (data.status === 'processing') {
+            // Show user-friendly message for background processing
+            alert(data.message)
+            setIsGenerating(false)
+            setRepoUrl('')
+            return
+          } else {
+            // Handle immediate completion (fallback)
+            const transformedData = transformAnalysisToWikiData(data)
+            setWikiData(transformedData)
+          }
+        } else {
+          throw new Error(data.error || 'Failed to analyze repository')
+        }
       } else {
         throw new Error('Failed to analyze repository')
       }
@@ -37,8 +149,21 @@ export default function Home() {
     }
   }
 
+  const handleRepositoryClick = (repository: Repository) => {
+    setSelectedRepository(repository)
+  }
+
+  const handleBackToHome = () => {
+    setSelectedRepository(null)
+    setWikiData(null)
+  }
+
   if (wikiData) {
-    return <EnhancedWikiGenerator wikiData={wikiData} repoUrl={repoUrl} onBack={() => setWikiData(null)} />
+    return <EnhancedWikiGenerator wikiData={wikiData} repoUrl={repoUrl} onBack={handleBackToHome} />
+  }
+
+  if (selectedRepository) {
+    return <RepositoryDocumentation repository={selectedRepository} onBack={handleBackToHome} />
   }
 
   return (
@@ -82,6 +207,9 @@ export default function Home() {
             <RepoInput onGenerate={handleGenerateWiki} isLoading={isGenerating} />
           </div>
         </div>
+
+        {/* Repository Tiles */}
+        <RepositoryTiles onRepositoryClick={handleRepositoryClick} />
 
         {/* Features */}
         <div className="mt-24 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
