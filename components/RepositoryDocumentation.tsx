@@ -55,6 +55,8 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedSection, setSelectedSection] = useState<string | null>(null)
+  const [sectionContent, setSectionContent] = useState<string>('')
+  const [contentLoading, setContentLoading] = useState(false)
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set())
 
   useEffect(() => {
@@ -74,7 +76,9 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
           setDocumentation(data)
           // Set first section as default if available
           if (data.documentationStructure && data.documentationStructure.length > 0) {
-            setSelectedSection(data.documentationStructure[0].title)
+            const firstSection = data.documentationStructure[0].title
+            setSelectedSection(firstSection)
+            fetchSectionContent(firstSection)
           }
         } else {
           setError(data.error || 'Failed to fetch documentation')
@@ -124,6 +128,36 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
 
   const isSectionCollapsed = (sectionTitle: string) => {
     return collapsedSections.has(sectionTitle)
+  }
+
+  const fetchSectionContent = async (sectionTitle: string) => {
+    if (!repository.github_url) return
+    
+    try {
+      setContentLoading(true)
+      const response = await fetch(`/api/get-documentation?repo=${encodeURIComponent(repository.github_url)}&section=${encodeURIComponent(sectionTitle)}&type=docs`)
+      
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success && data.content) {
+          setSectionContent(data.content)
+        } else {
+          setSectionContent('Content not available for this section.')
+        }
+      } else {
+        setSectionContent('Failed to load content for this section.')
+      }
+    } catch (error) {
+      console.error('Error fetching section content:', error)
+      setSectionContent('Error loading content for this section.')
+    } finally {
+      setContentLoading(false)
+    }
+  }
+
+  const handleSectionClick = (sectionTitle: string) => {
+    setSelectedSection(sectionTitle)
+    fetchSectionContent(sectionTitle)
   }
 
 
@@ -262,7 +296,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
                         if (section.children && section.children.length > 0) {
                           toggleSection(section.title)
                         } else {
-                          setSelectedSection(section.title)
+                          handleSectionClick(section.title)
                         }
                       }}
                       className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
@@ -291,7 +325,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
                         {section.children.map((child) => (
                           <button
                             key={child.title}
-                            onClick={() => setSelectedSection(child.title)}
+                            onClick={() => handleSectionClick(child.title)}
                             className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
                               selectedSection === child.title
                                 ? 'bg-primary-100 text-primary-700 font-medium'
@@ -319,13 +353,22 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
                   <h2 className="text-2xl font-bold text-gray-900">{selectedSection}</h2>
                 </div>
                 <div className="p-6">
-                  <div className="text-center py-12">
-                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Content Not Available</h3>
-                    <p className="text-gray-600">
-                      The content for this section is not yet available. This may be because the documentation is still being generated or the section content needs to be fetched separately.
-                    </p>
-                  </div>
+                  {contentLoading ? (
+                    <div className="flex justify-center items-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+                      <span className="ml-2 text-gray-600">Loading content...</span>
+                    </div>
+                  ) : sectionContent ? (
+                    <MarkdownRenderer content={sectionContent} />
+                  ) : (
+                    <div className="text-center py-12">
+                      <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Content Not Available</h3>
+                      <p className="text-gray-600">
+                        The content for this section is not yet available. This may be because the documentation is still being generated or the section content needs to be fetched separately.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
