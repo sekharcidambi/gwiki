@@ -10,10 +10,18 @@ import RepositoryDocumentation from '@/components/RepositoryDocumentation'
 interface Repository {
   name: string
   github_url: string
-  latest_version: string
-  generated_at: string
-  documentation_type: string
-  available_sections: string[]
+  description: string
+  language: string
+  stars: number
+  topics: string[]
+  business_domain: string
+  last_updated: string
+  has_documentation: boolean
+  has_wiki: boolean
+  storage: {
+    type: string
+    bucket: string
+  }
 }
 
 interface DocumentationPage {

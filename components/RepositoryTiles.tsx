@@ -6,10 +6,18 @@ import { Github, Calendar, FileText, Star, ExternalLink, Loader2 } from 'lucide-
 interface Repository {
   name: string
   github_url: string
-  latest_version: string
-  generated_at: string
-  documentation_type: string
-  available_sections: string[]
+  description: string
+  language: string
+  stars: number
+  topics: string[]
+  business_domain: string
+  last_updated: string
+  has_documentation: boolean
+  has_wiki: boolean
+  storage: {
+    type: string
+    bucket: string
+  }
 }
 
 interface RepositoryTilesProps {
@@ -145,33 +153,33 @@ export default function RepositoryTiles({ onRepositoryClick }: RepositoryTilesPr
             <div className="space-y-3">
               <div className="flex items-center text-sm text-gray-600">
                 <Calendar className="h-4 w-4 mr-2" />
-                <span>Analyzed {formatDate(repo.generated_at)}</span>
+                <span>Updated {formatDate(repo.last_updated)}</span>
               </div>
               
               <div className="flex items-center text-sm text-gray-600">
                 <FileText className="h-4 w-4 mr-2" />
-                <span>{repo.available_sections.length} sections</span>
+                <span>{repo.language || 'Unknown'} language</span>
               </div>
               
               <div className="flex items-center text-sm text-gray-600">
                 <Star className="h-4 w-4 mr-2" />
-                <span>Version {repo.latest_version}</span>
+                <span>{repo.business_domain || 'Unknown'} domain</span>
               </div>
             </div>
             
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="flex flex-wrap gap-1">
-                {repo.available_sections.slice(0, 3).map((section) => (
+                {(repo.topics || []).slice(0, 3).map((topic) => (
                   <span
-                    key={section}
+                    key={topic}
                     className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
                   >
-                    {section}
+                    {topic}
                   </span>
                 ))}
-                {repo.available_sections.length > 3 && (
+                {(repo.topics || []).length > 3 && (
                   <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
-                    +{repo.available_sections.length - 3} more
+                    +{(repo.topics || []).length - 3} more
                   </span>
                 )}
               </div>
