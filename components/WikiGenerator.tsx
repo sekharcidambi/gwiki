@@ -157,7 +157,7 @@ export default function WikiGenerator({ wikiData, repoUrl, onBack }: WikiGenerat
 
               {/* Navigation */}
               <nav className="space-y-1">
-                {wikiData.structure.map((item) => (
+                {(wikiData.structure || []).map((item) => (
                   <div key={item.path}>
                     <button
                       onClick={() => setSelectedPage(item.path)}
@@ -171,7 +171,7 @@ export default function WikiGenerator({ wikiData, repoUrl, onBack }: WikiGenerat
                     </button>
                     {item.children && (
                       <div className="ml-4 mt-1 space-y-1">
-                        {item.children.map((child) => (
+                        {(item.children || []).map((child) => (
                           <button
                             key={child.path}
                             onClick={() => setSelectedPage(child.path)}
@@ -240,7 +240,7 @@ export default function WikiGenerator({ wikiData, repoUrl, onBack }: WikiGenerat
                   <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-400 rounded-lg">
                     <h3 className="text-sm font-semibold text-green-900 mb-2">Key Points</h3>
                     <ul className="text-sm text-green-800 space-y-1">
-                      {currentPage.keyPoints.map((point, index) => (
+                      {(currentPage.keyPoints || []).map((point, index) => (
                         <li key={index} className="flex items-start">
                           <span className="text-green-600 mr-2">•</span>
                           {point}
@@ -255,7 +255,7 @@ export default function WikiGenerator({ wikiData, repoUrl, onBack }: WikiGenerat
                   <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
                     <h3 className="text-sm font-semibold text-yellow-900 mb-2">Suggested Improvements</h3>
                     <ul className="text-sm text-yellow-800 space-y-1">
-                      {currentPage.suggestedImprovements.map((improvement, index) => (
+                      {(currentPage.suggestedImprovements || []).map((improvement, index) => (
                         <li key={index} className="flex items-start">
                           <span className="text-yellow-600 mr-2">💡</span>
                           {improvement}

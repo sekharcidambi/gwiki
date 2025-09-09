@@ -95,7 +95,7 @@ function transformAnalysisToWikiData(analysisData: any) {
   }
 
   // Create navigation structure
-  const navigation = pages.map(page => ({
+  const navigation = (pages || []).map(page => ({
     title: page.title,
     path: page.path,
     children: []

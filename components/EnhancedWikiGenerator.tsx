@@ -295,7 +295,7 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
               {/* ADocS Documentation Navigation */}
               <div>
                 <nav className="space-y-1">
-                  {wikiData.navigation.map((item) => (
+                  {(wikiData.navigation || []).map((item) => (
                     <NavigationSection
                       key={item.path}
                       item={item}
