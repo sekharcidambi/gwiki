@@ -30,13 +30,21 @@ interface HierarchicalSection {
 interface DocumentationData {
   success: boolean
   repository: string
-  documentation_type: string
-  generated_at: string
-  structure: any
-  sections: Record<string, string>
-  available_sections: string[]
-  hierarchical_sections: HierarchicalSection[]
+  documentationStructure: {
+    sections: Array<{
+      title: string
+      children: Array<{
+        title: string
+        children: any[]
+      }>
+    }>
+  }
+  navigation: any[]
   metadata: any
+  storage: {
+    type: string
+    bucket: string
+  }
 }
 
 interface RepositoryDocumentationProps {
@@ -67,8 +75,8 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
         if (data.success) {
           setDocumentation(data)
           // Set first section as default if available
-          if (data.available_sections && data.available_sections.length > 0) {
-            setSelectedSection(data.available_sections[0])
+          if (data.documentationStructure?.sections && data.documentationStructure.sections.length > 0) {
+            setSelectedSection(data.documentationStructure.sections[0].title)
           }
         } else {
           setError(data.error || 'Failed to fetch documentation')
@@ -120,19 +128,6 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
     return collapsedSections.has(sectionTitle)
   }
 
-  const shouldShowSection = (section: HierarchicalSection, index: number, sections: HierarchicalSection[]) => {
-    if (section.level === 0) return true
-    
-    // Find the parent section
-    for (let i = index - 1; i >= 0; i--) {
-      const prevSection = sections[i]
-      if (prevSection.level < section.level) {
-        // This is the parent section
-        return !isSectionCollapsed(prevSection.title)
-      }
-    }
-    return true
-  }
 
   if (loading) {
     return (
@@ -246,11 +241,11 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
               <div className="flex items-center space-x-6 text-sm text-gray-600">
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-2" />
-                  <span>Generated {formatDate(documentation.generated_at)}</span>
+                  <span>Generated {formatDate(documentation.metadata?.generated_at || 'Unknown')}</span>
                 </div>
                 <div className="flex items-center">
                   <FileText className="h-4 w-4 mr-2" />
-                  <span>{documentation.available_sections.length} sections</span>
+                  <span>{documentation.documentationStructure?.sections?.length || 0} sections</span>
                 </div>
               </div>
             </div>
@@ -262,77 +257,77 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-8">
               <nav className="space-y-1">
-                {documentation.hierarchical_sections?.map((section, index) => {
-                  const isCollapsed = isSectionCollapsed(section.title)
-                  const shouldShow = shouldShowSection(section, index, documentation.hierarchical_sections)
-                  
-                  if (!shouldShow) return null
-                  
-                  return (
-                    <div key={section.title}>
-                      <button
-                        onClick={() => {
-                          if (section.has_children) {
-                            toggleSection(section.title)
-                          } else {
-                            setSelectedSection(section.title)
-                          }
-                        }}
-                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                          selectedSection === section.title
-                            ? 'bg-primary-100 text-primary-700 font-medium'
-                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                        }`}
-                        style={{
-                          paddingLeft: `${12 + (section.level * 20)}px`,
-                          borderLeft: section.level > 0 ? `2px solid ${section.level === 1 ? '#e5e7eb' : '#f3f4f6'}` : 'none',
-                          marginLeft: section.level > 0 ? '8px' : '0px'
-                        }}
-                      >
-                        <div className="flex items-center">
-                          {section.has_children ? (
-                            <span className="mr-2 text-gray-400 text-xs">
-                              {isCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                            </span>
-                          ) : (
-                            <span className="mr-2 w-3"></span>
-                          )}
-                          <span className={`${section.level > 0 ? 'text-sm' : 'font-medium'} ${
-                            section.level === 0 ? 'text-gray-900' : 
-                            section.level === 1 ? 'text-gray-800' : 'text-gray-700'
-                          }`}>
-                            {section.title}
+                {documentation.documentationStructure?.sections?.map((section) => (
+                  <div key={section.title}>
+                    <button
+                      onClick={() => {
+                        if (section.children && section.children.length > 0) {
+                          toggleSection(section.title)
+                        } else {
+                          setSelectedSection(section.title)
+                        }
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                        selectedSection === section.title
+                          ? 'bg-primary-100 text-primary-700 font-medium'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
+                    >
+                      <div className="flex items-center">
+                        {section.children && section.children.length > 0 ? (
+                          <span className="mr-2 text-gray-400 text-xs">
+                            {isSectionCollapsed(section.title) ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                           </span>
-                        </div>
-                      </button>
-                    </div>
-                  )
-                }) || documentation.available_sections.map((section) => (
-                  <button
-                    key={section}
-                    onClick={() => setSelectedSection(section)}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                      selectedSection === section
-                        ? 'bg-primary-100 text-primary-700 font-medium'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
-                  >
-                    {section}
-                  </button>
-                ))}
+                        ) : (
+                          <span className="mr-2 w-3"></span>
+                        )}
+                        <span className="font-medium text-gray-900">
+                          {section.title}
+                        </span>
+                      </div>
+                    </button>
+                    
+                    {/* Render children if expanded */}
+                    {section.children && section.children.length > 0 && !isSectionCollapsed(section.title) && (
+                      <div className="ml-4 space-y-1">
+                        {section.children.map((child) => (
+                          <button
+                            key={child.title}
+                            onClick={() => setSelectedSection(child.title)}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                              selectedSection === child.title
+                                ? 'bg-primary-100 text-primary-700 font-medium'
+                                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                            }`}
+                          >
+                            <span className="text-sm text-gray-800">
+                              {child.title}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )) || []}
               </nav>
             </div>
           </div>
 
           {/* Main Content */}
           <div className="lg:col-span-3">
-            {selectedSection && documentation.sections[selectedSection] ? (
+            {selectedSection ? (
               <div className="bg-white rounded-lg shadow-sm border">
                 <div className="p-6 border-b border-gray-200">
                   <h2 className="text-2xl font-bold text-gray-900">{selectedSection}</h2>
                 </div>
                 <div className="p-6">
-                  <MarkdownRenderer content={documentation.sections[selectedSection]} />
+                  <div className="text-center py-12">
+                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Content Not Available</h3>
+                    <p className="text-gray-600">
+                      The content for this section is not yet available. This may be because the documentation is still being generated or the section content needs to be fetched separately.
+                    </p>
+                  </div>
                 </div>
               </div>
             ) : (
