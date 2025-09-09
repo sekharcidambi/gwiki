@@ -57,16 +57,17 @@ export default function RepositoryTiles({ onRepositoryClick }: RepositoryTilesPr
   }
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'Unknown'
+    if (!dateString || dateString === 'Unknown') return 'Recently analyzed'
     try {
       const date = new Date(dateString)
+      if (isNaN(date.getTime())) return 'Recently analyzed'
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
       })
     } catch {
-      return 'Unknown'
+      return 'Recently analyzed'
     }
   }
 
@@ -158,28 +159,36 @@ export default function RepositoryTiles({ onRepositoryClick }: RepositoryTilesPr
               
               <div className="flex items-center text-sm text-gray-600">
                 <FileText className="h-4 w-4 mr-2" />
-                <span>{repo.language || 'Unknown'} language</span>
+                <span>{repo.language || 'Multi-language'} project</span>
               </div>
               
               <div className="flex items-center text-sm text-gray-600">
                 <Star className="h-4 w-4 mr-2" />
-                <span>{repo.business_domain || 'Unknown'} domain</span>
+                <span>{repo.business_domain || 'Software Development'}</span>
               </div>
             </div>
             
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="flex flex-wrap gap-1">
-                {(repo.topics || []).slice(0, 3).map((topic) => (
-                  <span
-                    key={topic}
-                    className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
-                  >
-                    {topic}
-                  </span>
-                ))}
-                {(repo.topics || []).length > 3 && (
-                  <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
-                    +{(repo.topics || []).length - 3} more
+                {(repo.topics || []).length > 0 ? (
+                  <>
+                    {(repo.topics || []).slice(0, 3).map((topic) => (
+                      <span
+                        key={topic}
+                        className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+                      >
+                        {topic}
+                      </span>
+                    ))}
+                    {(repo.topics || []).length > 3 && (
+                      <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+                        +{(repo.topics || []).length - 3} more
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">
+                    Documentation Available
                   </span>
                 )}
               </div>

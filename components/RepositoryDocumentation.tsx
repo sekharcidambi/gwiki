@@ -30,15 +30,13 @@ interface HierarchicalSection {
 interface DocumentationData {
   success: boolean
   repository: string
-  documentationStructure: {
-    sections: Array<{
+  documentationStructure: Array<{
+    title: string
+    children: Array<{
       title: string
-      children: Array<{
-        title: string
-        children: any[]
-      }>
+      children: any[]
     }>
-  }
+  }>
   navigation: any[]
   metadata: any
   storage: {
@@ -75,8 +73,8 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
         if (data.success) {
           setDocumentation(data)
           // Set first section as default if available
-          if (data.documentationStructure?.sections && data.documentationStructure.sections.length > 0) {
-            setSelectedSection(data.documentationStructure.sections[0].title)
+          if (data.documentationStructure && data.documentationStructure.length > 0) {
+            setSelectedSection(data.documentationStructure[0].title)
           }
         } else {
           setError(data.error || 'Failed to fetch documentation')
@@ -245,7 +243,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
                 </div>
                 <div className="flex items-center">
                   <FileText className="h-4 w-4 mr-2" />
-                  <span>{documentation.documentationStructure?.sections?.length || 0} sections</span>
+                  <span>{documentation.documentationStructure?.length || 0} sections</span>
                 </div>
               </div>
             </div>
@@ -257,7 +255,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-8">
               <nav className="space-y-1">
-                {documentation.documentationStructure?.sections?.map((section) => (
+                {documentation.documentationStructure?.map((section) => (
                   <div key={section.title}>
                     <button
                       onClick={() => {
