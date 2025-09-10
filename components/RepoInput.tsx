@@ -72,10 +72,10 @@ export default function RepoInput({ onGenerate, isLoading }: RepoInputProps) {
             {isLoading ? (
               <>
                 <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Generating Deep Dive...
+                Generating Analysis...
               </>
             ) : (
-              'Generate Deep Dive'
+              'Generate Analysis'
             )}
           </button>
           

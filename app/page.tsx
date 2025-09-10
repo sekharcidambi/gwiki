@@ -183,7 +183,7 @@ export default function Home() {
             <div className="flex items-center space-x-2">
               <BookOpen className="h-8 w-8 text-primary-600" />
               <h1 className="text-2xl font-bold text-gray-900">Glover Labs</h1>
-              <span className="text-lg text-gray-500">DeepDive</span>
+              <span className="text-lg text-gray-500">Gloki</span>
             </div>
             <div className="flex items-center space-x-4">
               <a

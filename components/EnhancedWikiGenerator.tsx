@@ -213,7 +213,7 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
               <div className="flex items-center space-x-2">
                 <BookOpen className="h-6 w-6 text-primary-600" />
                 <h1 className="text-xl font-semibold text-gray-900">Glover Labs</h1>
-                <span className="text-sm text-gray-500">RepoDeepDive</span>
+                <span className="text-sm text-gray-500">Gloki</span>
               </div>
             </div>
             
