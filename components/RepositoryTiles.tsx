@@ -135,7 +135,7 @@ export default function RepositoryTiles({ onRepositoryClick }: RepositoryTilesPr
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {repositories.map((repo) => (
+        {(repositories || []).map((repo) => (
           <div
             key={repo.name}
             onClick={() => onRepositoryClick(repo)}
