@@ -42,6 +42,7 @@ interface WikiData {
 
 // Transform analysis service response to WikiData structure
 function transformAnalysisToWikiData(analysisData: any) {
+  console.log('Received analysis data:', analysisData)
   const analysis = analysisData.analysis || {}
   const docStructure = analysisData.documentation_structure || {}
   
@@ -92,6 +93,33 @@ function transformAnalysisToWikiData(analysisData: any) {
         type: 'docs' as const
       })
     })
+  }
+
+  // Create fallback pages if no enhanced sections are available
+  if (pages.length === 0) {
+    // Create basic pages from documentation structure
+    if (docStructure.sections && docStructure.sections.length > 0) {
+      docStructure.sections.forEach((section: any) => {
+        pages.push({
+          title: section.title || 'Overview',
+          content: 'Content for this section is being generated...',
+          section: 'Overview',
+          subsection: section.title || 'Overview',
+          path: (section.title || 'overview').toLowerCase().replace(/\s+/g, '-'),
+          type: 'docs' as const
+        })
+      })
+    } else {
+      // Create a default overview page
+      pages.push({
+        title: 'Overview',
+        content: 'Repository analysis is in progress. Content will be available shortly.',
+        section: 'Overview',
+        subsection: 'Overview',
+        path: 'overview',
+        type: 'docs' as const
+      })
+    }
   }
 
   // Create navigation structure
