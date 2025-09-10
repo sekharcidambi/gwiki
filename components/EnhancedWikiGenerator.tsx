@@ -164,6 +164,10 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   // Remove tab state since we're only showing ADocS content
 
+  // Debug logging for navigation data
+  console.log('EnhancedWikiGenerator - wikiData.navigation:', wikiData.navigation)
+  console.log('EnhancedWikiGenerator - navigation length:', wikiData.navigation?.length)
+
   // Expand first few sections by default when navigation loads
   useEffect(() => {
     if (wikiData.navigation && wikiData.navigation.length > 0) {
@@ -332,17 +336,20 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
               {/* ADocS Documentation Navigation */}
               <div>
                 <nav className="space-y-1">
-                  {(wikiData.navigation || []).map((item) => (
-                    <NavigationSection
-                      key={item.path}
-                      item={item}
-                      expandedSections={expandedSections}
-                      selectedPage={selectedPage}
-                      onToggleSection={toggleSection}
-                      onSelectPage={setSelectedPage}
-                      level={0}
-                    />
-                  ))}
+                  {(wikiData.navigation || []).map((item, index) => {
+                    console.log(`Rendering item ${index}:`, item.title, 'level: 0')
+                    return (
+                      <NavigationSection
+                        key={item.path}
+                        item={item}
+                        expandedSections={expandedSections}
+                        selectedPage={selectedPage}
+                        onToggleSection={toggleSection}
+                        onSelectPage={setSelectedPage}
+                        level={0}
+                      />
+                    )
+                  })}
                 </nav>
               </div>
             </div>
