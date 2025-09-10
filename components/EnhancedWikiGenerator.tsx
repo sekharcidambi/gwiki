@@ -115,8 +115,6 @@ function NavigationSection({
   const isExpanded = expandedSections.has(item.title)
   const isSelected = selectedPage === item.path
   
-  // Debug logging
-  console.log(`Navigation item: "${item.title}", level: ${level}, hasChildren: ${hasChildren}`)
 
   return (
     <div>
@@ -126,12 +124,12 @@ function NavigationSection({
           isSelected && !hasChildren
             ? 'bg-primary-100 text-primary-900'
             : 'text-gray-700 hover:bg-gray-100'
-        } ${
-          level === 0 ? 'ml-0 pl-3 pr-3' :
-          level === 1 ? 'ml-8 pl-3 pr-3' :
-          level === 2 ? 'ml-16 pl-3 pr-3' :
-          'ml-24 pl-3 pr-3'
         }`}
+        style={{ 
+          marginLeft: `${level * 20}px`,
+          paddingLeft: '12px',
+          paddingRight: '12px'
+        }}
       >
         <span>{item.title}</span>
         {hasChildren && (
