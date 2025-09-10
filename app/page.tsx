@@ -260,14 +260,11 @@ export default function Home() {
               <span className="text-lg text-gray-500">Gloki</span>
             </div>
             <div className="flex items-center space-x-4">
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <Github className="h-6 w-6" />
-              </a>
+              <img 
+                src="/loki-icon.png" 
+                alt="Loki" 
+                className="h-6 w-6"
+              />
             </div>
           </div>
         </div>

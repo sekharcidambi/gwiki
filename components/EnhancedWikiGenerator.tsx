@@ -126,7 +126,7 @@ function NavigationSection({
             : 'text-gray-700 hover:bg-gray-100'
         }`}
         style={{ 
-          marginLeft: `${level * 20}px`,
+          marginLeft: `${level * 40}px`,
           paddingLeft: '12px',
           paddingRight: '12px'
         }}
