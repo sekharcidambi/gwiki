@@ -269,7 +269,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
             rel="noopener noreferrer"
             className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
           >
-            <Github className="h-5 w-5 mr-2" />
+            <img src="/loki-icon.png" alt="Loki" className="h-5 w-5 mr-2" />
             View on GitHub
             <ExternalLink className="h-4 w-4 ml-1" />
           </a>
@@ -333,7 +333,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
                     
                     {/* Render children if expanded */}
                     {section.children && section.children.length > 0 && !isSectionCollapsed(section.title) && (
-                      <div className="ml-4 space-y-1">
+                      <div className="ml-10 space-y-1">
                         {(section.children || []).map((child) => (
                           <button
                             key={child.title}
