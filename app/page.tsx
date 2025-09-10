@@ -7,6 +7,13 @@ import EnhancedWikiGenerator from '@/components/EnhancedWikiGenerator'
 import RepositoryTiles from '@/components/RepositoryTiles'
 import RepositoryDocumentation from '@/components/RepositoryDocumentation'
 
+interface NavigationItem {
+  title: string
+  path: string
+  type?: string
+  children?: NavigationItem[]
+}
+
 interface Repository {
   name: string
   github_url: string
@@ -123,11 +130,11 @@ function transformAnalysisToWikiData(analysisData: any) {
   }
 
   // Create navigation structure from documentation structure
-  const navigation = []
+  const navigation: NavigationItem[] = []
   
   if (docStructure.sections && docStructure.sections.length > 0) {
     docStructure.sections.forEach((section: any) => {
-      const sectionItem = {
+      const sectionItem: NavigationItem = {
         title: section.title,
         path: section.title.toLowerCase().replace(/\s+/g, '-'),
         children: []
@@ -136,7 +143,7 @@ function transformAnalysisToWikiData(analysisData: any) {
       // Add subsections if they exist
       if (section.children && section.children.length > 0) {
         section.children.forEach((subsection: any) => {
-          const subsectionItem = {
+          const subsectionItem: NavigationItem = {
             title: subsection.title,
             path: `${sectionItem.path}/${subsection.title.toLowerCase().replace(/\s+/g, '-')}`,
             children: []
@@ -145,7 +152,7 @@ function transformAnalysisToWikiData(analysisData: any) {
           // Add sub-subsections if they exist
           if (subsection.children && subsection.children.length > 0) {
             subsection.children.forEach((subsubsection: any) => {
-              subsectionItem.children.push({
+              subsectionItem.children!.push({
                 title: subsubsection.title,
                 path: `${subsectionItem.path}/${subsubsection.title.toLowerCase().replace(/\s+/g, '-')}`,
                 children: []
@@ -153,7 +160,7 @@ function transformAnalysisToWikiData(analysisData: any) {
             })
           }
           
-          sectionItem.children.push(subsectionItem)
+          sectionItem.children!.push(subsectionItem)
         })
       }
       
