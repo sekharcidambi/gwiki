@@ -119,12 +119,12 @@ function NavigationSection({
     <div>
       <button
         onClick={() => hasChildren ? onToggleSection(item.title) : onSelectPage(item.path)}
-        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+        className={`w-full flex items-center justify-between py-2 rounded-lg text-sm font-medium transition-colors ${
           isSelected && !hasChildren
             ? 'bg-primary-100 text-primary-900'
             : 'text-gray-700 hover:bg-gray-100'
         }`}
-        style={{ paddingLeft: `${12 + level * 24}px` }}
+        style={{ paddingLeft: `${12 + level * 24}px`, paddingRight: '12px' }}
       >
         <span>{item.title}</span>
         {hasChildren && (
