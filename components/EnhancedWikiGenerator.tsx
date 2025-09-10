@@ -115,21 +115,19 @@ function NavigationSection({
   const isExpanded = expandedSections.has(item.title)
   const isSelected = selectedPage === item.path
   
+  // Debug logging
+  console.log(`Navigation item: "${item.title}", level: ${level}, hasChildren: ${hasChildren}`)
+  
 
   return (
-    <div>
+    <div style={{ marginLeft: `${level * 40}px` }}>
       <button
         onClick={() => hasChildren ? onToggleSection(item.title) : onSelectPage(item.path)}
-        className={`w-full flex items-center justify-between py-2 rounded-lg text-sm font-medium transition-colors ${
+        className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
           isSelected && !hasChildren
             ? 'bg-primary-100 text-primary-900'
             : 'text-gray-700 hover:bg-gray-100'
         }`}
-        style={{ 
-          marginLeft: `${level * 40}px`,
-          paddingLeft: '12px',
-          paddingRight: '12px'
-        }}
       >
         <span>{item.title}</span>
         {hasChildren && (
