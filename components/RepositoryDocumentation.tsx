@@ -30,13 +30,15 @@ interface HierarchicalSection {
 interface DocumentationData {
   success: boolean
   repository: string
-  documentationStructure: Array<{
-    title: string
-    children: Array<{
+  documentationStructure: {
+    sections: Array<{
       title: string
-      children: any[]
+      children: Array<{
+        title: string
+        children: any[]
+      }>
     }>
-  }>
+  }
   navigation: any[]
   metadata: any
   storage: {
@@ -73,15 +75,15 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
       if (response.ok) {
         const data = await response.json()
         if (data.success) {
-          // Ensure documentationStructure is an array
+          // Ensure documentationStructure has the correct structure
           const docData = {
             ...data,
-            documentationStructure: Array.isArray(data.documentationStructure) ? data.documentationStructure : []
+            documentationStructure: data.documentationStructure || { sections: [] }
           }
           setDocumentation(docData)
           // Set first section as default if available
-          if (docData.documentationStructure && docData.documentationStructure.length > 0) {
-            const firstSection = docData.documentationStructure[0].title
+          if (docData.documentationStructure?.sections && docData.documentationStructure.sections.length > 0) {
+            const firstSection = docData.documentationStructure.sections[0].title
             setSelectedSection(firstSection)
             fetchSectionContent(firstSection)
           }
@@ -282,7 +284,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
                 </div>
                 <div className="flex items-center">
                   <FileText className="h-4 w-4 mr-2" />
-                  <span>{documentation.documentationStructure?.length || 0} sections</span>
+                  <span>{documentation.documentationStructure?.sections?.length || 0} sections</span>
                 </div>
               </div>
             </div>
@@ -294,7 +296,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-8">
               <nav className="space-y-1">
-                {(documentation.documentationStructure || []).map((section) => (
+                {(documentation.documentationStructure?.sections || []).map((section) => (
                   <div key={section.title}>
                     <button
                       onClick={() => {
