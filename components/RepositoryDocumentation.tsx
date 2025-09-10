@@ -152,7 +152,12 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
           setSectionContent('Content not available for this section.')
         }
       } else {
-        setSectionContent('Failed to load content for this section.')
+        // Handle 404 and other errors more gracefully
+        if (response.status === 404) {
+          setSectionContent(`## ${sectionTitle}\n\n**Content Not Yet Available**\n\nThis section is part of the documentation structure but the detailed content has not been generated yet. The documentation system is working on creating comprehensive content for this section.\n\n**Repository Information:**\n- **Repository:** ${repository.name}\n- **GitHub URL:** [${repository.github_url}](${repository.github_url})\n- **Business Domain:** ${repository.business_domain || 'Software Development'}\n- **Language:** ${repository.language || 'Multi-language'}\n\n**What you can do:**\n- Visit the [GitHub repository](${repository.github_url}) to explore the code directly\n- Check back later as more content is being generated\n- Use the repository structure to understand the codebase organization`)
+        } else {
+          setSectionContent('Failed to load content for this section.')
+        }
       }
     } catch (error) {
       console.error('Error fetching section content:', error)
@@ -280,7 +285,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
               <div className="flex items-center space-x-6 text-sm text-gray-600">
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-2" />
-                  <span>Generated {formatDate(documentation.metadata?.generated_at || 'Unknown')}</span>
+                  <span>Generated {formatDate(documentation.metadata?.generated_at || documentation.metadata?.timestamp || 'Recently')}</span>
                 </div>
                 <div className="flex items-center">
                   <FileText className="h-4 w-4 mr-2" />
