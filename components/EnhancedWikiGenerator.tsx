@@ -158,6 +158,9 @@ function NavigationSection({
 }
 
 export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: EnhancedWikiGeneratorProps) {
+  console.log('🚀 EnhancedWikiGenerator component is being rendered!')
+  console.log('📊 wikiData:', wikiData)
+  
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -334,7 +337,8 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
               </div>
 
               {/* ADocS Documentation Navigation */}
-              <div>
+              <div style={{ border: '3px solid red', padding: '10px' }}>
+                <div style={{ color: 'red', fontWeight: 'bold' }}>DEBUG: EnhancedWikiGenerator Navigation</div>
                 <nav className="space-y-1">
                   {(wikiData.navigation || []).map((item, index) => {
                     console.log(`Rendering item ${index}:`, item.title, 'level: 0')
