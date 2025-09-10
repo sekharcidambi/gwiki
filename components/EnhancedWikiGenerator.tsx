@@ -123,8 +123,12 @@ function NavigationSection({
           isSelected && !hasChildren
             ? 'bg-primary-100 text-primary-900'
             : 'text-gray-700 hover:bg-gray-100'
+        } ${
+          level === 0 ? 'pl-3 pr-3' :
+          level === 1 ? 'pl-9 pr-3' :
+          level === 2 ? 'pl-12 pr-3' :
+          'pl-16 pr-3'
         }`}
-        style={{ paddingLeft: `${12 + level * 24}px`, paddingRight: '12px' }}
       >
         <span>{item.title}</span>
         {hasChildren && (
