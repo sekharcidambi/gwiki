@@ -124,7 +124,7 @@ function NavigationSection({
             ? 'bg-primary-100 text-primary-900'
             : 'text-gray-700 hover:bg-gray-100'
         }`}
-        style={{ paddingLeft: `${12 + level * 16}px` }}
+        style={{ paddingLeft: `${12 + level * 24}px` }}
       >
         <span>{item.title}</span>
         {hasChildren && (
