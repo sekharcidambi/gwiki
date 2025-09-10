@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'GWiki - Instant GitHub Repository Wikis',
+  title: 'Gloki - Instant GitHub Repository Wikis',
   description: 'Generate beautiful wikis instantly from any GitHub repository',
   keywords: 'wiki, github, documentation, markdown, repository',
 }
