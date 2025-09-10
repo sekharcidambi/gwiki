@@ -34,10 +34,6 @@ export default function RepoInput({ onGenerate, isLoading }: RepoInputProps) {
     onGenerate(repoUrl.trim())
   }
 
-  const handleExampleClick = () => {
-    setRepoUrl('https://github.com/vercel/next.js')
-    setError('')
-  }
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -77,15 +73,6 @@ export default function RepoInput({ onGenerate, isLoading }: RepoInputProps) {
             ) : (
               'Generate Analysis'
             )}
-          </button>
-          
-          <button
-            type="button"
-            onClick={handleExampleClick}
-            disabled={isLoading}
-            className="btn-secondary text-lg py-3 px-8"
-          >
-            Try Example
           </button>
         </div>
       </form>
