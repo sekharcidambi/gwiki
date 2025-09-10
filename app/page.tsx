@@ -122,12 +122,51 @@ function transformAnalysisToWikiData(analysisData: any) {
     }
   }
 
-  // Create navigation structure
-  const navigation = (pages || []).map(page => ({
-    title: page.title,
-    path: page.path,
-    children: []
-  }))
+  // Create navigation structure from documentation structure
+  const navigation = []
+  
+  if (docStructure.sections && docStructure.sections.length > 0) {
+    docStructure.sections.forEach((section: any) => {
+      const sectionItem = {
+        title: section.title,
+        path: section.title.toLowerCase().replace(/\s+/g, '-'),
+        children: []
+      }
+      
+      // Add subsections if they exist
+      if (section.children && section.children.length > 0) {
+        section.children.forEach((subsection: any) => {
+          const subsectionItem = {
+            title: subsection.title,
+            path: `${sectionItem.path}/${subsection.title.toLowerCase().replace(/\s+/g, '-')}`,
+            children: []
+          }
+          
+          // Add sub-subsections if they exist
+          if (subsection.children && subsection.children.length > 0) {
+            subsection.children.forEach((subsubsection: any) => {
+              subsectionItem.children.push({
+                title: subsubsection.title,
+                path: `${subsectionItem.path}/${subsubsection.title.toLowerCase().replace(/\s+/g, '-')}`,
+                children: []
+              })
+            })
+          }
+          
+          sectionItem.children.push(subsectionItem)
+        })
+      }
+      
+      navigation.push(sectionItem)
+    })
+  } else {
+    // Fallback to pages-based navigation
+    navigation.push(...(pages || []).map(page => ({
+      title: page.title,
+      path: page.path,
+      children: []
+    })))
+  }
 
   return {
     repository,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { 
   Search, 
   ArrowLeft, 
@@ -158,8 +158,20 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['Overview']))
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   // Remove tab state since we're only showing ADocS content
+
+  // Expand first few sections by default when navigation loads
+  useEffect(() => {
+    if (wikiData.navigation && wikiData.navigation.length > 0) {
+      const defaultExpanded = new Set<string>()
+      // Expand the first 3 sections by default
+      wikiData.navigation.slice(0, 3).forEach(section => {
+        defaultExpanded.add(section.title)
+      })
+      setExpandedSections(defaultExpanded)
+    }
+  }, [wikiData.navigation])
 
   const filteredPages = useMemo(() => {
     if (!wikiData.pages) return []
@@ -174,9 +186,31 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
     )
   }, [wikiData.pages, searchQuery])
 
+  // Function to find or create content for a navigation item
+  const getContentForPath = (path: string) => {
+    // First try to find existing page
+    const existingPage = wikiData.pages?.find(p => p.path === path)
+    if (existingPage) {
+      return existingPage
+    }
+    
+    // If no existing page, create a placeholder based on the path
+    const pathParts = path.split('/')
+    const title = pathParts[pathParts.length - 1].replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    
+    return {
+      title: title,
+      content: `Content for **${title}** is being generated. This section will contain detailed information about ${title.toLowerCase()}.`,
+      path: path,
+      section: pathParts[0] || 'Overview',
+      subsection: title,
+      type: 'docs' as const
+    }
+  }
+
   const currentPage = selectedPage 
-    ? wikiData.pages?.find(p => p.path === selectedPage)
-    : wikiData.pages?.[0]
+    ? getContentForPath(selectedPage)
+    : wikiData.pages?.[0] || getContentForPath('overview')
 
   const toggleSection = (sectionTitle: string) => {
     const newExpanded = new Set(expandedSections)
