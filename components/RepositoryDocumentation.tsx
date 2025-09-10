@@ -73,10 +73,15 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
       if (response.ok) {
         const data = await response.json()
         if (data.success) {
-          setDocumentation(data)
+          // Ensure documentationStructure is an array
+          const docData = {
+            ...data,
+            documentationStructure: Array.isArray(data.documentationStructure) ? data.documentationStructure : []
+          }
+          setDocumentation(docData)
           // Set first section as default if available
-          if (data.documentationStructure && data.documentationStructure.length > 0) {
-            const firstSection = data.documentationStructure[0].title
+          if (docData.documentationStructure && docData.documentationStructure.length > 0) {
+            const firstSection = docData.documentationStructure[0].title
             setSelectedSection(firstSection)
             fetchSectionContent(firstSection)
           }
@@ -289,7 +294,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-8">
               <nav className="space-y-1">
-                {documentation.documentationStructure?.map((section) => (
+                {(documentation.documentationStructure || []).map((section) => (
                   <div key={section.title}>
                     <button
                       onClick={() => {
@@ -322,7 +327,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
                     {/* Render children if expanded */}
                     {section.children && section.children.length > 0 && !isSectionCollapsed(section.title) && (
                       <div className="ml-4 space-y-1">
-                        {section.children.map((child) => (
+                        {(section.children || []).map((child) => (
                           <button
                             key={child.title}
                             onClick={() => handleSectionClick(child.title)}

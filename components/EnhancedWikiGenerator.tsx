@@ -137,7 +137,7 @@ function NavigationSection({
       </button>
       {hasChildren && isExpanded && (
         <div className="space-y-1">
-          {item.children!.map((child) => (
+          {(item.children || []).map((child) => (
             <NavigationSection
               key={child.path}
               item={child}
