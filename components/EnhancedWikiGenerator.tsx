@@ -114,10 +114,6 @@ function NavigationSection({
   const hasChildren = item.children && item.children.length > 0
   const isExpanded = expandedSections.has(item.title)
   const isSelected = selectedPage === item.path
-  
-  // Debug logging
-  console.log(`Navigation item: "${item.title}", level: ${level}, hasChildren: ${hasChildren}`)
-  
 
   return (
     <div style={{ marginLeft: `${level * 40}px` }}>
@@ -158,18 +154,11 @@ function NavigationSection({
 }
 
 export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: EnhancedWikiGeneratorProps) {
-  console.log('🚀 EnhancedWikiGenerator component is being rendered!')
-  console.log('📊 wikiData:', wikiData)
-  
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedPage, setSelectedPage] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   // Remove tab state since we're only showing ADocS content
-
-  // Debug logging for navigation data
-  console.log('EnhancedWikiGenerator - wikiData.navigation:', wikiData.navigation)
-  console.log('EnhancedWikiGenerator - navigation length:', wikiData.navigation?.length)
 
   // Expand first few sections by default when navigation loads
   useEffect(() => {
@@ -337,12 +326,8 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
               </div>
 
               {/* ADocS Documentation Navigation */}
-              <div style={{ border: '3px solid red', padding: '10px' }}>
-                <div style={{ color: 'red', fontWeight: 'bold' }}>DEBUG: EnhancedWikiGenerator Navigation</div>
-                <nav className="space-y-1">
-                  {(wikiData.navigation || []).map((item, index) => {
-                    console.log(`Rendering item ${index}:`, item.title, 'level: 0')
-                    return (
+              <nav className="space-y-1">
+                  {(wikiData.navigation || []).map((item, index) => (
                       <NavigationSection
                         key={item.path}
                         item={item}
@@ -352,10 +337,8 @@ export default function EnhancedWikiGenerator({ wikiData, repoUrl, onBack }: Enh
                         onSelectPage={setSelectedPage}
                         level={0}
                       />
-                    )
-                  })}
+                    ))}
                 </nav>
-              </div>
             </div>
           )}
         </div>
