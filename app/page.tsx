@@ -49,7 +49,6 @@ interface WikiData {
 
 // Transform analysis service response to WikiData structure
 function transformAnalysisToWikiData(analysisData: any) {
-  console.log('Received analysis data:', analysisData)
   const analysis = analysisData.analysis || {}
   const docStructure = analysisData.documentation_structure || {}
   
