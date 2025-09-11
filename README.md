@@ -1,6 +1,6 @@
-# GWiki - AI-Enhanced GitHub Repository Wikis
+# Gloki - AI-Enhanced GitHub Repository Wikis
 
-GWiki is a modern web application that instantly generates beautiful, AI-enhanced wikis from any GitHub repository. Powered by Claude AI, it provides intelligent content summarization, documentation enhancement, and key insights. Simply paste a repository URL and get comprehensive, enhanced documentation in seconds.
+Gloki is a modern web application that instantly generates beautiful, AI-enhanced wikis from any GitHub repository. Powered by Claude AI, it provides intelligent content summarization, documentation enhancement, and key insights. Simply paste a repository URL and get comprehensive, enhanced documentation in seconds.
 
 ## Features
 
