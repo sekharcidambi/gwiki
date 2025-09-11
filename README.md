@@ -127,7 +127,7 @@ Generates a wiki from a GitHub repository URL.
 ### Project Structure
 
 ```
-gwiki/
+gloki/
 ├── app/                    # Next.js app directory
 │   ├── api/               # API routes
 │   ├── globals.css        # Global styles
