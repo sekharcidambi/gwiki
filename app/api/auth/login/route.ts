@@ -45,6 +45,19 @@ function getUsers() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if authentication is enabled
+    const authEnabled = process.env.AUTH_ENABLED === 'true'
+    
+    if (!authEnabled) {
+      return NextResponse.json({
+        success: true,
+        user: {
+          username: 'guest',
+          isAuthenticated: true
+        }
+      })
+    }
+
     const { username, password } = await request.json()
 
     if (!username || !password) {

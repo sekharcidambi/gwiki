@@ -21,6 +21,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    // Check if authentication is enabled
+    const authEnabled = process.env.NEXT_PUBLIC_AUTH_ENABLED === 'true'
+    
+    if (!authEnabled) {
+      // If auth is disabled, set a default authenticated user
+      setUser({ username: 'guest', isAuthenticated: true })
+      setIsLoading(false)
+      return
+    }
+
     // Check if user is already logged in (check localStorage)
     const savedUser = localStorage.getItem('gloki_user')
     if (savedUser) {
@@ -35,6 +45,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = async (username: string, password: string): Promise<boolean> => {
+    // Check if authentication is enabled
+    const authEnabled = process.env.NEXT_PUBLIC_AUTH_ENABLED === 'true'
+    
+    if (!authEnabled) {
+      // If auth is disabled, just set the user as authenticated
+      const userData = { username: 'guest', isAuthenticated: true }
+      setUser(userData)
+      return true
+    }
+
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
