@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Github, Search, BookOpen, Zap, Users, Star } from 'lucide-react'
+import { Github, Search, BookOpen, Zap, Users, Star, LogOut } from 'lucide-react'
 import RepoInput from '@/components/RepoInput'
 import EnhancedWikiGenerator from '@/components/EnhancedWikiGenerator'
 import RepositoryTiles from '@/components/RepositoryTiles'
 import RepositoryDocumentation from '@/components/RepositoryDocumentation'
+import LoginForm from '@/components/LoginForm'
+import { useAuth } from '@/lib/auth'
 
 interface NavigationItem {
   title: string
@@ -183,6 +185,7 @@ function transformAnalysisToWikiData(analysisData: any) {
 }
 
 export default function Home() {
+  const { user, login, logout, isLoading } = useAuth()
   const [repoUrl, setRepoUrl] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [wikiData, setWikiData] = useState<WikiData | null>(null)
@@ -239,6 +242,20 @@ export default function Home() {
     setWikiData(null)
   }
 
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    )
+  }
+
+  // Show login form if not authenticated
+  if (!user) {
+    return <LoginForm onLogin={login} isLoading={isGenerating} />
+  }
+
   if (wikiData) {
     return <EnhancedWikiGenerator wikiData={wikiData} repoUrl={repoUrl} onBack={handleBackToHome} />
   }
@@ -259,6 +276,17 @@ export default function Home() {
               <span className="text-lg text-gray-500">Gloki</span>
             </div>
             <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">
+                Welcome, <span className="font-medium text-gray-900">{user?.username}</span>
+              </span>
+              <button
+                onClick={logout}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                title="Logout"
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="text-sm">Logout</span>
+              </button>
               <img 
                 src="/loki-icon.png" 
                 alt="Loki" 
