@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { BookOpen, FileText, ExternalLink } from 'lucide-react'
+import { BookOpen, FileText, ExternalLink, MessageCircle } from 'lucide-react'
 
 interface TabNavigationProps {
-  activeTab: 'repository' | 'requirements'
-  onTabChange: (tab: 'repository' | 'requirements') => void
+  activeTab: 'repository' | 'requirements' | 'chat'
+  onTabChange: (tab: 'repository' | 'requirements' | 'chat') => void
 }
 
 export default function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
@@ -23,6 +23,14 @@ export default function TabNavigation({ activeTab, onTabChange }: TabNavigationP
       description: 'Manage requirements and user stories',
       external: true,
       url: 'https://gloki-requirements.vercel.app'
+    },
+    {
+      id: 'chat' as const,
+      label: 'Assistant',
+      icon: MessageCircle,
+      description: 'AI-powered chat assistance',
+      external: true,
+      url: 'https://glover-chat.vercel.app'
     }
   ]
 

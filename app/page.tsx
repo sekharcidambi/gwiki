@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Github, Search, BookOpen, Zap, Users, Star, LogOut, FileText, ExternalLink } from 'lucide-react'
+import { Github, Search, BookOpen, Zap, Users, Star, LogOut, FileText, ExternalLink, MessageCircle } from 'lucide-react'
 import RepoInput from '@/components/RepoInput'
 import EnhancedWikiGenerator from '@/components/EnhancedWikiGenerator'
 import RepositoryTiles from '@/components/RepositoryTiles'
@@ -187,7 +187,7 @@ function transformAnalysisToWikiData(analysisData: any) {
 
 export default function Home() {
   const { user, login, logout, isLoading } = useAuth()
-  const [activeTab, setActiveTab] = useState<'repository' | 'requirements'>('repository')
+  const [activeTab, setActiveTab] = useState<'repository' | 'requirements' | 'chat'>('repository')
   const [repoUrl, setRepoUrl] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [wikiData, setWikiData] = useState<WikiData | null>(null)
@@ -413,6 +413,32 @@ export default function Home() {
               >
                 <FileText className="h-5 w-5 mr-2" />
                 Open Requirements Dashboard
+                <ExternalLink className="h-4 w-4 ml-2" />
+              </a>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* Assistant Tab Content */}
+      {activeTab === 'chat' && (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 sm:text-6xl">
+              AI <span className="text-primary-600">Assistant</span>
+            </h1>
+            <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
+              Get AI-powered assistance for your development questions, code reviews, and technical discussions. Click the "Assistant" tab above to access the chat interface.
+            </p>
+            <div className="mt-8">
+              <a
+                href="https://glover-chat.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors"
+              >
+                <MessageCircle className="h-5 w-5 mr-2" />
+                Open AI Assistant
                 <ExternalLink className="h-4 w-4 ml-2" />
               </a>
             </div>
