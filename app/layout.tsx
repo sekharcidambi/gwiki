@@ -6,9 +6,14 @@ import { AuthProvider } from '@/lib/auth'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Gloki - Instant GitHub Repository Wikis',
+  title: 'Glover Labs - Gloki',
   description: 'Generate beautiful wikis instantly from any GitHub repository',
-  keywords: 'wiki, github, documentation, markdown, repository',
+  keywords: 'wiki, github, documentation, markdown, repository, glover labs',
+  icons: {
+    icon: '/glover-labs-logo.png',
+    shortcut: '/glover-labs-logo.png',
+    apple: '/glover-labs-logo.png',
+  },
 }
 
 export default function RootLayout({

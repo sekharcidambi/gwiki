@@ -34,11 +34,14 @@ export default function LoginForm({ onLogin, isLoading }: LoginFormProps) {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex justify-center">
-            <div className="flex items-center space-x-2">
-              <BookOpen className="h-12 w-12 text-primary-600" />
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/glover-labs-logo.png" 
+                alt="Glover Labs" 
+                className="h-12 w-12"
+              />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Glover Labs</h1>
-                <p className="text-lg text-gray-500">Gloki</p>
               </div>
             </div>
           </div>
