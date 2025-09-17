@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Github, Search, BookOpen, Zap, Users, Star, LogOut } from 'lucide-react'
+import { Github, Search, BookOpen, Zap, Users, Star, LogOut, FileText, ExternalLink } from 'lucide-react'
 import RepoInput from '@/components/RepoInput'
 import EnhancedWikiGenerator from '@/components/EnhancedWikiGenerator'
 import RepositoryTiles from '@/components/RepositoryTiles'
 import RepositoryDocumentation from '@/components/RepositoryDocumentation'
 import LoginForm from '@/components/LoginForm'
+import TabNavigation from '@/components/TabNavigation'
 import { useAuth } from '@/lib/auth'
 
 interface NavigationItem {
@@ -186,6 +187,7 @@ function transformAnalysisToWikiData(analysisData: any) {
 
 export default function Home() {
   const { user, login, logout, isLoading } = useAuth()
+  const [activeTab, setActiveTab] = useState<'repository' | 'requirements'>('repository')
   const [repoUrl, setRepoUrl] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [wikiData, setWikiData] = useState<WikiData | null>(null)
@@ -297,8 +299,12 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Tab Navigation */}
+      <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {/* Main Content */}
+      {activeTab === 'repository' && (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 sm:text-6xl">
             GitHub Repository
@@ -385,7 +391,34 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </main>
+        </main>
+      )}
+
+      {/* Requirements Management Tab Content */}
+      {activeTab === 'requirements' && (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 sm:text-6xl">
+              Requirements <span className="text-primary-600">Management</span>
+            </h1>
+            <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
+              Manage requirements and user stories across projects. Click the "Requirements Management" tab above to access the full dashboard.
+            </p>
+            <div className="mt-8">
+              <a
+                href="https://gloki-requirements.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors"
+              >
+                <FileText className="h-5 w-5 mr-2" />
+                Open Requirements Dashboard
+                <ExternalLink className="h-4 w-4 ml-2" />
+              </a>
+            </div>
+          </div>
+        </main>
+      )}
     </div>
   )
 } 
