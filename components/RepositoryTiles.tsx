@@ -154,7 +154,7 @@ export default function RepositoryTiles({ onRepositoryClick }: RepositoryTilesPr
             <div className="space-y-3">
               <div className="flex items-center text-sm text-gray-600">
                 <Calendar className="h-4 w-4 mr-2" />
-                <span>Updated {formatDate(repo.last_updated)}</span>
+                <span>{formatDate(repo.last_updated)}</span>
               </div>
               
               <div className="flex items-center text-sm text-gray-600">

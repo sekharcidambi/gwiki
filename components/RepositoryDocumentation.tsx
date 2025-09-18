@@ -102,9 +102,10 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
   }
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'Unknown'
+    if (!dateString || dateString === 'Recently') return 'Recently'
     try {
       const date = new Date(dateString)
+      if (isNaN(date.getTime())) return 'Recently'
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
@@ -113,7 +114,7 @@ export default function RepositoryDocumentation({ repository, onBack }: Reposito
         minute: '2-digit'
       })
     } catch {
-      return 'Unknown'
+      return 'Recently'
     }
   }
 
